@@ -1,5 +1,5 @@
 import os
-import time
+import json
 import typing as tp
 import numpy as np
 import pandas as pd
@@ -11,7 +11,7 @@ from catboost import CatBoostRegressor, Pool
 
 from src import utils
 
-model_path = '../models'
+metric_path = 'reports/metrics'
 
 RS = 35
 
@@ -19,7 +19,7 @@ metrics = [r2_score, mean_squared_error]
 
 
 def get_metrics(y_true: np.ndarray, y_pred: np.ndarray, metrics: tp.List[tp.Callable] = metrics) -> str:
-    return ', '.join([f'{i.__name__}={i(y_true, y_pred):.4f}' for i in metrics])
+    return {i.__name__: i(y_true, y_pred) for i in metrics}
 
 
 def evaluate(train, target, model, name) -> None:
@@ -28,4 +28,7 @@ def evaluate(train, target, model, name) -> None:
 
     model.fit(train_data, train_target)
     y_pred = model.predict(val_data)
-    print(f'{name}: {get_metrics(val_target.to_numpy(), y_pred)}')
+    metrics = get_metrics(val_target.to_numpy(), y_pred)
+    print(f'{name}: {metrics}')
+    with open(os.path.join(metric_path, f'{name}.json'), 'w', encoding='utf-8') as f:
+        json.dump(metrics, f, ensure_ascii=False, indent=4)

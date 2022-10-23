@@ -1,0 +1,30 @@
+stages:
+  make_dataset_stage:
+    cmd: python src/data/make_dataset.py data/raw/train.csv data/raw/test.csv data/processed/
+    deps:
+    - data/raw/test.csv
+    - data/raw/train.csv
+    outs:
+    - data/processed/test.pkl
+    - data/processed/train.pkl
+    - data/processed/train_target.pkl
+  train_model_satge:
+    cmd: python src/models/train_model.py data/processed/train.pkl data/processed/train_target.pkl
+      models/
+    deps:
+    - data/processed/train.pkl
+    - data/processed/train_target.pkl
+    outs:
+    - models/catboost.pkl
+    - models/ridge.pkl
+    metrics:
+    - reports/metrics/Catboost.json
+    - reports/metrics/Ridge.json
+  predict_model_stage:
+    cmd: python src/models/predict_model.py
+    deps:
+    - data/processed/test.pkl
+    - data/processed/train.pkl
+    - data/processed/train_target.pkl
+    - models/catboost.pkl
+    - models/ridge.pkl

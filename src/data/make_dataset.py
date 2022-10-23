@@ -10,8 +10,8 @@ processed_data_path = 'data/processed/'
 
 
 @click.command()
-@click.argument('input_train_path', type=click.Path(exists=True))
-@click.argument('input_test_path', type=click.Path(exists=True))
+@click.argument('input_train_path', default='data/raw/train.csv', type=click.Path(exists=True))
+@click.argument('input_test_path', default='data/raw/test.csv', type=click.Path(exists=True))
 @click.argument('output_dir', default=processed_data_path, type=click.Path())
 def main(input_train_path, input_test_path, output_dir):
     """ Runs data processing scripts to turn raw data from (../raw) into
